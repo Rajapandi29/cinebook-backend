@@ -1,0 +1,19 @@
+{
+ "IsEncrypted": false,
+ "Values": {
+  "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+  "FUNCTIONS_WORKER_RUNTIME": "node",
+  "COSMOS_ENDPOINT": "https://YOUR-ACCOUNT.documents.azure.com:443/",
+  "COSMOS_DATABASE": "cinebook",
+  "COSMOS_CONTAINER": "appdata",
+  "BLOB_ACCOUNT_URL": "https://YOUR-ACCOUNT.blob.core.windows.net",
+  "BLOB_CONTAINER": "posters",
+  "KEY_VAULT_URL": "https://YOUR-VAULT.vault.azure.net/",
+  "SERVICE_BUS_NAMESPACE": "YOUR-NAMESPACE.servicebus.windows.net",
+  "SERVICE_BUS_TOPIC": "booking-events",
+  "ENTRA_TENANT_ID": "YOUR-EXTERNAL-TENANT-ID",
+  "ENTRA_API_AUDIENCE": "YOUR-API-APP-ID",
+  "ENTRA_ISSUER": "YOUR-EXPECTED-ISSUER",
+  "CORS_ORIGINS": "http://localhost:5173"
+ }
+}
