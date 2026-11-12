@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+
   workflow_dispatch:
 
 env:
@@ -12,6 +13,8 @@ env:
   AZURE_FUNCTIONAPP_NAME: 'cinebook-api'
 
 jobs:
+
+  # JOB 1: BUILD BACKEND
   build:
     runs-on: ubuntu-latest
 
@@ -19,6 +22,7 @@ jobs:
       contents: read
 
     steps:
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -33,13 +37,17 @@ jobs:
       - name: Run Tests
         run: npm test --if-present
 
-      - name: Install Production Dependencies Only
-        run: npm prune --omit=dev
-
-      - name: Verify Azure Functions Files
+      - name: Verify Function App Files
         run: |
+          echo "Checking Azure Functions files..."
+
           test -f host.json
           test -f package.json
+
+          echo "Required files found."
+
+      - name: Install Production Dependencies
+        run: npm prune --omit=dev
 
       - name: Create Deployment ZIP
         run: |
@@ -49,35 +57,33 @@ jobs:
                "local.settings.json" \
                "release.zip"
 
-      - name: Upload Deployment Package
+      - name: Upload Deployment Artifact
         uses: actions/upload-artifact@v4
         with:
           name: cinebook-backend
           path: release.zip
+          retention-days: 3
 
+
+  # JOB 2: DEPLOY TO AZURE
   deploy:
     runs-on: ubuntu-latest
+
     needs: build
 
     permissions:
       contents: read
 
     steps:
-      - name: Download Deployment Package
+
+      - name: Download Deployment Artifact
         uses: actions/download-artifact@v4
         with:
           name: cinebook-backend
-
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_3E36C054A3324A798BC9E93A16C58A9E }}
-          client-secret: ${{ secrets.AZUREAPPSERVICE_CLIENTSECRET }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_FC06FE53DC9F42AC9100381A6A752507 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C8A7E9A48C9B45A38112B681E7B0C745 }}
 
       - name: Deploy to Azure Function App
         uses: Azure/functions-action@v1
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: release.zip
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
